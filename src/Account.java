@@ -17,7 +17,7 @@ public class Account {
 
     public String getHistory() {
         String a = "";
-        for(String el : this.history) {
+        for (String el : this.history) {
             a += el + "\n";
         }
         return a;
@@ -27,8 +27,8 @@ public class Account {
         return this.wallet;
     }
 
-    public boolean tryTranscaction(float value) {
-        if(value < 0 && this.wallet + value < 0) {
+    public boolean tryTransaction(float value) {
+        if (value < 0 && this.wallet + value < 0) {
             return false;
         } else {
             return true;
@@ -67,10 +67,10 @@ public class Account {
                 String line = fileScanner.nextLine();
                 this.history.add(line);
             }
-            System.out.println("Данные успешно загружены! Операций найдено: " + this.history.size());
+            int a = this.history.size() - 1;
+            System.out.println("Данные успешно загружены! Операций найдено: " + a);
         } catch (Exception e) {
             System.out.println("Ошибка при чтении файла данных.");
         }
     }
-
 }
