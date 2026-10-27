@@ -65,6 +65,10 @@ public class Contacts {
         return this.contacts.get(number);
     }
 
+    public void removeContact(String number) {
+        this.contacts.remove(number);
+    }
+
 }
 
 

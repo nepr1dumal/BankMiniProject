@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Scanner;
 
 public class Main {
@@ -11,15 +13,15 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         System.out.println("Добро пожаловать!");
         while(flag){
-            System.out.println("*** МойБанк ***\n1. Добавить доход\n2. Добавить расход\n3. Перевести деньги контакту\n4. Добавить новый контакт\n5. Показать историю и баланс\n6. Показать список контактов\n7. Очистить историю\n8. Выйти из программы");
+            System.out.println("*** МойБанк ***\n1. Добавить доход\n2. Добавить расход\n3. Перевести деньги контакту\n4. Изменить контакты\n5. Показать историю и баланс\n6. Показать список контактов\n7. Очистить историю\n8. Выйти из программы");
             String choise = scan.nextLine();
             switch(choise) {
                 case "1":
                     System.out.print("Введите операцию в формате:\nСумма: ");
                     try {
                         String summaStr = scan.nextLine();
-                        float b = Float.parseFloat(summaStr);
-                        if (b <= 0) {
+                        BigDecimal b = new BigDecimal(summaStr).setScale(2, RoundingMode.HALF_UP);
+                        if (b.signum() <= 0) {
                             System.out.println("Сумма должна быть больше нуля");
                             break;
                         }
@@ -37,12 +39,12 @@ public class Main {
                     System.out.print("Введите операцию в формате:\nСумма (положительное число): ");
                     try {
                         String summaStr = scan.nextLine();
-                        float b = Float.parseFloat(summaStr);
-                        if(b <= 0) {
-                            System.out.println("Неверное число");
+                        BigDecimal b = new BigDecimal(summaStr).setScale(2, RoundingMode.HALF_UP);
+                        if(b.signum() <= 0) {
+                            System.out.println("Сумма должна быть больше 0");
                             break;
                         }
-                        b = 0 - b;
+                        b = b.negate();
                         System.out.print("Название: ");
                         String nazv = scan.nextLine();
                         System.out.print("Дата (формат DD/MM/YY): ");
@@ -64,9 +66,9 @@ public class Main {
                         System.out.println("Получатель: " + contacts.getName(number));
                         try {
                             System.out.print("Введите сумму перевода: ");
-                            float value = Float.parseFloat(scan.nextLine());
-                            if (value > 0) {
-                                value = -value;
+                            BigDecimal value = new BigDecimal(scan.nextLine()).setScale(2, RoundingMode.HALF_UP);
+                            if (value.signum() > 0) {
+                                value = value.negate();
                                 System.out.print("Введите дату (формат DD/MM/YY): ");
                                 String date = scan.nextLine();
                                 if (main.tryTransaction(value)) {
@@ -76,7 +78,7 @@ public class Main {
                                     System.out.println("Недостаточно средств");
                                 }
                             } else {
-                                System.out.println("Неверная сумма");
+                                System.out.println("Сумма перевода должна быть больше 0");
                             }
                         } catch (NumberFormatException e) {
                             System.out.println("Ошибка! Нужно ввести число.");
@@ -87,23 +89,14 @@ public class Main {
                     break;
                 }
                 case "4": {
-                    System.out.print("Введите номер карты (без пробелов): ");
-                    String card = scan.nextLine();
-                    if (card.matches("\\d{16}")) {
-                        if (contacts.getName(card) == null) {
-                            System.out.print("Введите имя: ");
-                            String name = scan.nextLine().trim();
-                            if (name.isEmpty()) {
-                                System.out.println("Имя не может быть пустым");
-                                break;
-                            }
-                            contacts.saveContact(card, name);
-                            System.out.println("Контакт сохранён");
-                        } else {
-                            System.out.println("Такая карта уже существует, перезаписать контакт? Y/N");
-                            String choose = scan.nextLine().toUpperCase();
-                            switch (choose) {
-                                case "Y":
+                    System.out.println("1. Добавить контакт\n2. Удалить контакт");
+                    String selection = scan.nextLine();
+                    switch (selection) {
+                        case "1":
+                            System.out.print("Введите номер карты (без пробелов): ");
+                            String card = scan.nextLine();
+                            if (card.matches("\\d{16}")) {
+                                if (contacts.getName(card) == null) {
                                     System.out.print("Введите имя: ");
                                     String name = scan.nextLine().trim();
                                     if (name.isEmpty()) {
@@ -111,24 +104,67 @@ public class Main {
                                         break;
                                     }
                                     contacts.saveContact(card, name);
-                                    System.out.println("Контакт перезаписан");
-                                    break;
-                                case "N":
-                                    System.out.println("Отменено");
-                                    break;
-                                default:
-                                    System.out.println("Неверная команда");
+                                    System.out.println("Контакт сохранён");
+                                } else {
+                                    System.out.println("Такая карта уже существует, перезаписать контакт? Y/N");
+                                    String choose = scan.nextLine().toUpperCase();
+                                    switch (choose) {
+                                        case "Y":
+                                            System.out.print("Введите имя: ");
+                                            String name = scan.nextLine().trim();
+                                            if (name.isEmpty()) {
+                                                System.out.println("Имя не может быть пустым");
+                                                break;
+                                            }
+                                            contacts.saveContact(card, name);
+                                            System.out.println("Контакт перезаписан");
+                                            break;
+                                        case "N":
+                                            System.out.println("Отменено");
+                                            break;
+                                        default:
+                                            System.out.println("Неверная команда");
+                                    }
+                                }
+                            } else {
+                                System.out.println("Неправильный формат карты");
                             }
-                        }
-                    } else {
-                        System.out.println("Неправильный номер карты");
+                            break;
+                        case "2":
+                            System.out.print("Введите номер карты (без пробелов): ");
+                            String number = scan.nextLine();
+                            if (number.matches("\\d{16}")) {
+                                if (contacts.haveContact(number)) {
+                                    System.out.println("Удаление: " + contacts.getName(number) + ". Y/N?");
+                                    String a = scan.nextLine().trim().toUpperCase();
+                                    switch (a) {
+                                        case "Y":
+                                            contacts.removeContact(number);
+                                            System.out.println("Успешное удаление");
+                                            break;
+                                        case "N":
+                                            System.out.println("Возвращение...");
+                                            break;
+                                        default:
+                                            System.out.println("Неверный выбор");
+                                    }
+                                } else {
+                                    System.out.println("Контакта с таким номером карты не существует");
+                                }
+                            } else {
+                                System.out.println("Неверный формат карты");
+                            }
+                            break;
+                        default:
+                            System.out.println("Неверная команда");
+                            break;
                     }
-                    break;
                 }
+                break;
                 case "5":
                     System.out.println("Сумма | Название | Дата");
                     System.out.println(main.getHistory());
-                    System.out.println("Баланс: " + main.getWallet() + " RUB");
+                    System.out.println("Баланс: " + main.getWallet().toPlainString() + " RUB");
                     break;
                 case "6":
                     String list = contacts.getContacts();

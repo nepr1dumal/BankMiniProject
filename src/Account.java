@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -6,12 +8,12 @@ import java.util.Scanner;
 
 public class Account {
 
-    private float wallet;
+    private BigDecimal wallet = BigDecimal.ZERO.setScale(2,RoundingMode.HALF_UP);
     private ArrayList<String> history = new ArrayList<>();
 
-    public void newTransaction(float value, String name, String date) {
-        String transaction = String.valueOf(value) + " | " + name + " | " + date;
-        this.wallet += value;
+    public void newTransaction(BigDecimal value, String name, String date) {
+        String transaction = value.toPlainString() + " | " + name + " | " + date;
+        this.wallet = this.wallet.add(value);
         this.history.add(transaction);
     }
 
@@ -23,16 +25,12 @@ public class Account {
         return a;
     }
 
-    public float getWallet() {
+    public BigDecimal getWallet() {
         return this.wallet;
     }
 
-    public boolean tryTransaction(float value) {
-        if (value < 0 && this.wallet + value < 0) {
-            return false;
-        } else {
-            return true;
-        }
+    public boolean tryTransaction(BigDecimal value) {
+        return this.wallet.add(value).signum() >= 0;
     }
 
     public void clearHistory() {
@@ -41,7 +39,7 @@ public class Account {
 
     public void saveToFile() {
         try (FileWriter writer = new FileWriter("database.txt")) {
-            writer.write(this.wallet + "\n");
+            writer.write(this.wallet.toPlainString() + "\n");
             for (String line : this.history) {
                 writer.write(line + "\n");
             }
@@ -61,13 +59,13 @@ public class Account {
         try (Scanner fileScanner = new Scanner(file)) {
             if (fileScanner.hasNextLine()) {
                 String walletStr = fileScanner.nextLine();
-                this.wallet = Float.parseFloat(walletStr);
+                this.wallet = new BigDecimal(walletStr).setScale(2, RoundingMode.HALF_UP);
             }
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 this.history.add(line);
             }
-            int a = this.history.size() - 1;
+            int a = this.history.size();
             System.out.println("Данные успешно загружены! Операций найдено: " + a);
         } catch (Exception e) {
             System.out.println("Ошибка при чтении файла данных.");
