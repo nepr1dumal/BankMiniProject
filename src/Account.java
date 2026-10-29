@@ -11,19 +11,19 @@ import java.util.Scanner;
 public class Account {
 
     private BigDecimal wallet = BigDecimal.ZERO.setScale(2,RoundingMode.HALF_UP);
-    private ArrayList<String> history = new ArrayList<>();
+    private ArrayList<Transaction> history = new ArrayList<>();
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yy");
 
     public void newTransaction(BigDecimal value, String name) {
         String date = LocalDate.now().format(format);
         String transaction = value.toPlainString() + " | " + name + " | " + date;
         this.wallet = this.wallet.add(value);
-        this.history.add(transaction);
+        this.history.add(new Transaction(value, name));
     }
 
     public String getHistory() {
         String a = "";
-        for (String el : this.history) {
+        for (Transaction el : this.history) {
             a += el + "\n";
         }
         return a;
@@ -44,7 +44,7 @@ public class Account {
     public void saveToFile() {
         try (FileWriter writer = new FileWriter("database.txt")) {
             writer.write(this.wallet.toPlainString() + "\n");
-            for (String line : this.history) {
+            for (Transaction line : this.history) {
                 writer.write(line + "\n");
             }
             System.out.println("Данные успешно сохранены в database.txt");
@@ -66,8 +66,11 @@ public class Account {
                 this.wallet = new BigDecimal(walletStr).setScale(2, RoundingMode.HALF_UP);
             }
             while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine();
-                this.history.add(line);
+                String[] line = fileScanner.nextLine().split(" \\| ", 3);
+                if (line.length != 3) {
+                    continue;
+                }
+                this.history.add(new Transaction(new BigDecimal(line[0]).setScale(2, RoundingMode.HALF_UP), line[1], line[2]));
             }
             int a = this.history.size();
             System.out.println("Данные успешно загружены! Операций найдено: " + a);

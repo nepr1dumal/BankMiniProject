@@ -23,7 +23,7 @@ public class Main {
                     }
                     String name = ConsoleInput.readName(scan, "Название операции: ");
                     main.newTransaction(summ, name);
-                    System.out.print("Операция успешно завершена.");
+                    System.out.println("Операция успешно завершена.");
                     break;
                 }
                 case "2": {
