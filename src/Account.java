@@ -1,5 +1,7 @@
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,8 +12,10 @@ public class Account {
 
     private BigDecimal wallet = BigDecimal.ZERO.setScale(2,RoundingMode.HALF_UP);
     private ArrayList<String> history = new ArrayList<>();
+    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-    public void newTransaction(BigDecimal value, String name, String date) {
+    public void newTransaction(BigDecimal value, String name) {
+        String date = LocalDate.now().format(format);
         String transaction = value.toPlainString() + " | " + name + " | " + date;
         this.wallet = this.wallet.add(value);
         this.history.add(transaction);
