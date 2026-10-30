@@ -2,7 +2,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class Transaction {
+public abstract class Transaction {
 
     private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
     private String name;
@@ -10,13 +10,13 @@ public class Transaction {
     private BigDecimal value;
 
 
-    public Transaction(BigDecimal value, String name) {
+    protected Transaction(BigDecimal value, String name) {
         this.value = value;
         this.name = name;
         this.date = LocalDate.now().format(FORMAT);
     }
 
-    public Transaction(BigDecimal value, String name, String date) {
+    protected Transaction(BigDecimal value, String name, String date) {
         this.value = value;
         this.name = name;
         this.date = date;
@@ -34,9 +34,11 @@ public class Transaction {
         return this.date;
     }
 
+    public abstract String getType();
+
     @Override
     public String toString() {
-        return value.toPlainString() + " | " + name + " | " + date;
+        return getType() + " | " + value.toPlainString() + "RUB" + " | " + name + " | " + date;
     }
 
 }

@@ -14,11 +14,9 @@ public class Account {
     private ArrayList<Transaction> history = new ArrayList<>();
     private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-    public void newTransaction(BigDecimal value, String name) {
-        String date = LocalDate.now().format(format);
-        String transaction = value.toPlainString() + " | " + name + " | " + date;
-        this.wallet = this.wallet.add(value);
-        this.history.add(new Transaction(value, name));
+    public void newTransaction(Transaction t) {
+        this.wallet = this.wallet.add(t.getValue());
+        this.history.add(t);
     }
 
     public String getHistory() {
@@ -66,11 +64,12 @@ public class Account {
                 this.wallet = new BigDecimal(walletStr).setScale(2, RoundingMode.HALF_UP);
             }
             while (fileScanner.hasNextLine()) {
-                String[] line = fileScanner.nextLine().split(" \\| ", 3);
-                if (line.length != 3) {
-                    continue;
+                String[] line = fileScanner.nextLine().split(" \\| ");
+                switch (line[0]) {
+                    case "INCOME" -> {if (line.length == 4) history.add(new Income(new BigDecimal(line[1]), line[2], line[3])); }
+                    case "EXPENSE" -> {if (line.length == 4) history.add(new Expense(new BigDecimal(line[1]), line[2], line[3])); }
+                    case "TRANSFER" -> {if (line.length == 5) history.add(new Transfer(new BigDecimal(line[1]), line[3], line[4])); }
                 }
-                this.history.add(new Transaction(new BigDecimal(line[0]).setScale(2, RoundingMode.HALF_UP), line[1], line[2]));
             }
             int a = this.history.size();
             System.out.println("Данные успешно загружены! Операций найдено: " + a);
