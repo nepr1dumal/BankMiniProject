@@ -37,6 +37,5 @@ public class Main {
                     System.out.println("Неверный выбор, попробуйте снова.\n");
             }
         }
-
     }
 }

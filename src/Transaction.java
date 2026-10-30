@@ -38,7 +38,7 @@ public abstract class Transaction {
 
     @Override
     public String toString() {
-        return getType() + " | " + value.toPlainString() + "RUB" + " | " + name + " | " + date;
+        return getType() + " | " + value.toPlainString() + " | " + name + " | " + date;
     }
 
 }

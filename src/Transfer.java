@@ -26,7 +26,7 @@ public class Transfer extends Transaction{
 
     @Override
     public String toString() {
-        return getType() + " | " + getValue().toPlainString() + "RUB" + " | " + getName() + " | " + getNameOfUser() + " | " + getDate();
+        return getType() + " | " + getValue().toPlainString() + " | " + getName() + " | " + getNameOfUser() + " | " + getDate();
     }
 
 }
