@@ -1,16 +1,31 @@
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
+import java.math.RoundingMode;
 
 public class Stock {
 
-    private LinkedHashMap<String, BigDecimal> stocks = new LinkedHashMap<>();
+    private String name;
+    private BigDecimal price;
 
-    public Stock() {
-        stocks.put("SBER", new BigDecimal("300.00"));
-        stocks.put("VTBV", new BigDecimal("1300.00"));
-        stocks.put("MGNT", new BigDecimal("500.00"));
-        stocks.put("X5GR", new BigDecimal("250.00"));
-        stocks.put("GAZP", new BigDecimal("10.00"));
-        stocks.put("VKGR", new BigDecimal("10000.00"));
-        }
+    public Stock(String name, BigDecimal value) {
+        this.name = name;
+        this.price = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    private void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public void updatePrice(int percent) {
+        BigDecimal dDPercent = new BigDecimal(percent);
+        dDPercent = dDPercent.add(new BigDecimal(100000)).divide(new BigDecimal(100000));
+        setPrice(this.price.multiply(dDPercent).setScale(2, RoundingMode.HALF_UP));
+    }
 }

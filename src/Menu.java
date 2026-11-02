@@ -5,11 +5,13 @@ public class Menu {
     private Scanner scan;
     private Account account;
     private Contacts contacts;
+    private Stocks stocks;
 
-    public Menu(Scanner scan, Account account, Contacts contacts) {
+    public Menu(Scanner scan, Account account, Contacts contacts, Stocks stocks) {
         this.scan = scan;
         this.account = account;
         this.contacts = contacts;
+        this.stocks = stocks;
     }
 
     public void operations() {
@@ -168,5 +170,37 @@ public class Menu {
         account.saveToFile();
         contacts.saveContacts();
         System.out.println("Всего доброго!");
+    }
+
+    public void operationStocks() {
+        boolean status = true;
+        while (status) {
+            System.out.println("1. Купить акции\n2. Продать акции\n3. Назад");
+            String choose = scan.nextLine();
+            switch (choose) {
+                case "1":
+                    stocks.updateStocks();
+                    System.out.println(stocks.toString());
+                    System.out.println("Выберите акцию для покупки");
+                    Stock nowStock = stocks.getStock(scan.nextLine());
+                    if (nowStock == null) {
+                        System.out.println("Неверная команда");
+                    } else {
+                        System.out.println(nowStock.getName() + ": " + nowStock.getPrice() + "\nВведите количетсво акций: ");
+
+                    }
+
+
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    System.out.println("Возвращение...");
+                    status = false;
+                    break;
+                default:
+                    System.out.println("Неверная команда");
+            }
+        }
     }
 }
