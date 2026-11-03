@@ -1,6 +1,8 @@
+package Model;
+
 import java.math.BigDecimal;
 
-public class StockPurchase extends Transaction{
+public class StockPurchase extends Transaction {
 
     private static final String TYPE = "STOCK PURCHASE";
     private int quantity;

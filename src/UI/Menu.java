@@ -1,3 +1,11 @@
+package UI;
+
+import Bank.Account;
+import Bank.Contacts;
+import Bank.Stocks;
+import Bank.StocksPortfolio;
+import Model.*;
+
 import java.math.BigDecimal;
 import java.util.Scanner;
 
@@ -6,12 +14,14 @@ public class Menu {
     private Account account;
     private Contacts contacts;
     private Stocks stocks;
+    private StocksPortfolio stocksPortfolio;
 
-    public Menu(Scanner scan, Account account, Contacts contacts, Stocks stocks) {
+    public Menu(Scanner scan, Account account, Contacts contacts, Stocks stocks, StocksPortfolio stocksPortfolio) {
         this.scan = scan;
         this.account = account;
         this.contacts = contacts;
         this.stocks = stocks;
+        this.stocksPortfolio = stocksPortfolio;
     }
 
     public void operations() {
@@ -150,7 +160,7 @@ public class Menu {
     }
 
     public void showHistoryAndBalance() {
-        System.out.println("Тип | Сумма | Название | (Получатель) | Дата");
+        System.out.println("Тип | Сумма | Название | (Получатель)/(Количество акций) | Дата");
         System.out.println(account.getHistory());
         System.out.println("Баланс: " + account.getWallet().toPlainString() + " RUB");
     }
@@ -169,6 +179,7 @@ public class Menu {
     public void exit() {
         account.saveToFile();
         contacts.saveContacts();
+        stocksPortfolio.saveHoldings();
         System.out.println("Всего доброго!");
     }
 
@@ -194,6 +205,7 @@ public class Menu {
                         BigDecimal value = nowStock.getPrice().multiply(new BigDecimal(number)).negate();
                         if (account.tryTransaction(value)) {
                             account.newTransaction(new StockPurchase(value, "Покупка: " + nowStock.getName(), number));
+
                             System.out.println("Успешная покупка!");
                         } else {
                             System.out.println("Недостаточно средств");
@@ -202,6 +214,9 @@ public class Menu {
                     break;
                 case "2":
                     stocks.updateStocks();
+                    System.out.println(stocksPortfolio.toString());
+                    System.out.println("Выберите акцию для продажи");
+
                     break;
                 case "3":
                     System.out.println("Возвращение...");

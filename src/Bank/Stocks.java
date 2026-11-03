@@ -1,3 +1,7 @@
+package Bank;
+
+import Model.Stock;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
@@ -40,6 +44,15 @@ public class Stocks {
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             return null;
         }
+    }
+
+    public Stock getStockByName(String name) {
+        for (Stock line : list) {
+            if (name.equals(line.getName())) {
+                return line;
+            }
+        }
+        return null;
     }
 
 }

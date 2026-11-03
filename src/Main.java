@@ -1,3 +1,9 @@
+import Bank.Account;
+import Bank.Contacts;
+import Bank.Stocks;
+import Bank.StocksPortfolio;
+import UI.Menu;
+
 import java.util.Scanner;
 
 public class Main {
@@ -6,10 +12,12 @@ public class Main {
         Account main = new Account();
         Contacts contacts = new Contacts();
         Stocks stocks = new Stocks();
+        StocksPortfolio stocksPortfolio = new StocksPortfolio(stocks);
         Scanner scan = new Scanner(System.in);
-        Menu menu = new Menu(scan, main, contacts, stocks);
+        Menu menu = new Menu(scan, main, contacts, stocks, stocksPortfolio);
         main.loadFromFile();
         contacts.loadContacts();
+        stocksPortfolio.loadFromFile();
         boolean flag = true;
         System.out.println("Добро пожаловать!");
         while(flag){

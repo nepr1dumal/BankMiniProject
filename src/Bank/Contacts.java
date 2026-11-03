@@ -1,3 +1,5 @@
+package Bank;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,7 +44,7 @@ public class Contacts {
         try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNextLine()) {
                 String[] cards = fileScanner.nextLine().split("\\|", 2);
-                if (cards.length == 2) {
+                if (cards.length == 2 && cards[0].matches("\\d{16}")) {
                     contacts.put(cards[0], cards[1]);
                 }
             }

@@ -1,6 +1,8 @@
+package Model;
+
 import java.math.BigDecimal;
 
-public class Expense extends Transaction{
+public class Expense extends Transaction {
 
     private static final String TYPE = "EXPENSE";
 
