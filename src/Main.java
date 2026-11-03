@@ -25,6 +25,7 @@ public class Main {
                     break;
                 }
                 case "3": {
+                    menu.operationStocks();
                     break;
                 }
                 case "4":

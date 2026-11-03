@@ -186,13 +186,22 @@ public class Menu {
                     if (nowStock == null) {
                         System.out.println("Неверная команда");
                     } else {
-                        System.out.println(nowStock.getName() + ": " + nowStock.getPrice() + "\nВведите количетсво акций: ");
-
+                        int number = ConsoleInput.readNumber(scan, "Покупка: " + nowStock.getName() + ". Введите количеcтво акций(Enter - отмена): ");
+                        if (number == -404) {
+                            System.out.println("Возвращение...");
+                            break;
+                        }
+                        BigDecimal value = nowStock.getPrice().multiply(new BigDecimal(number)).negate();
+                        if (account.tryTransaction(value)) {
+                            account.newTransaction(new StockPurchase(value, "Покупка: " + nowStock.getName(), number));
+                            System.out.println("Успешная покупка!");
+                        } else {
+                            System.out.println("Недостаточно средств");
+                        }
                     }
-
-
                     break;
                 case "2":
+                    stocks.updateStocks();
                     break;
                 case "3":
                     System.out.println("Возвращение...");
