@@ -180,6 +180,7 @@ public class Menu {
         account.saveToFile();
         contacts.saveContacts();
         stocksPortfolio.saveHoldings();
+        stocks.saveStocks();
         System.out.println("Всего доброго!");
     }
 
@@ -189,34 +190,64 @@ public class Menu {
             System.out.println("1. Купить акции\n2. Продать акции\n3. Назад");
             String choose = scan.nextLine();
             switch (choose) {
-                case "1":
+                case "1": {
                     stocks.updateStocks();
                     System.out.println(stocks.toString());
-                    System.out.println("Выберите акцию для покупки");
-                    Stock nowStock = stocks.getStock(scan.nextLine());
+                    String numberOfStock = ConsoleInput.readStock(scan, "Выберите акцию для покупки (Enter - отмена): ");
+                    if (numberOfStock == null) {
+                        System.out.println("Возвращение...");
+                        break;
+                    }
+                    Stock nowStock = stocks.getStock(numberOfStock);
                     if (nowStock == null) {
                         System.out.println("Неверная команда");
                     } else {
-                        int number = ConsoleInput.readNumber(scan, "Покупка: " + nowStock.getName() + ". Введите количеcтво акций(Enter - отмена): ");
+                        int number = ConsoleInput.readNumber(scan, "Покупка: " + nowStock.getName() + ". Введите количество акций(Enter - отмена): ");
                         if (number == -404) {
                             System.out.println("Возвращение...");
                             break;
                         }
                         BigDecimal value = nowStock.getPrice().multiply(new BigDecimal(number)).negate();
                         if (account.tryTransaction(value)) {
-                            account.newTransaction(new StockPurchase(value, "Покупка: " + nowStock.getName(), number));
-
-                            System.out.println("Успешная покупка!");
+                            if (stocksPortfolio.updateHoldings(nowStock.getName(), number)) {
+                                account.newTransaction(new StockPurchase(value, "Покупка: " + nowStock.getName(), number));
+                                System.out.println("Успешная покупка!");
+                            }
                         } else {
                             System.out.println("Недостаточно средств");
                         }
                     }
                     break;
+                }
                 case "2":
                     stocks.updateStocks();
-                    System.out.println(stocksPortfolio.toString());
-                    System.out.println("Выберите акцию для продажи");
-
+                    if (stocksPortfolio.toString().isEmpty()) {
+                        System.out.println("Пустой портфель");
+                    } else {
+                        System.out.println(stocksPortfolio.toString());
+                        String numberOfStock = ConsoleInput.readStock(scan, "Выберите акцию для продажи (Enter - отмена): ");
+                        if (numberOfStock == null) {
+                            System.out.println("Возвращение...");
+                            break;
+                        }
+                        Holding nowHolding = stocksPortfolio.getHolding(numberOfStock);
+                        if (nowHolding == null) {
+                            System.out.println("Неверная команда");
+                        } else {
+                            BigDecimal value = new BigDecimal(String.valueOf(stocks.getStockByName(nowHolding.getName()).getPrice()));
+                            int number = ConsoleInput.readNumber(scan, nowHolding.getName() + ". Введите количество акций (Enter - отмена): ");
+                            if (number == -404) {
+                                System.out.println("Возвращение...");
+                                break;
+                            }
+                            if (stocksPortfolio.updateHoldings(nowHolding.getName(), -number)) {
+                                account.newTransaction(new StockSale(value.multiply(new BigDecimal(number)), "Продажа: " + nowHolding.getName(), number));
+                                System.out.println("Успешная транзакция");
+                            } else {
+                                System.out.println("Недостаточно акций");
+                            }
+                        }
+                    }
                     break;
                 case "3":
                     System.out.println("Возвращение...");

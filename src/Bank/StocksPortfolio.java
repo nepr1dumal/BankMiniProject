@@ -24,10 +24,41 @@ public class StocksPortfolio {
         String spisok = "";
         for (Holding line : list) {
             Stock nowStock = stocks.getStockByName(line.getName());
-            spisok += i + ": " + line.getName() + " " + line.getQuantity() + " штук. Цена: " + nowStock.getPrice() + "\n";
+            spisok += i + ": " + line.getName() + ". Количество - " + line.getQuantity() + ". Цена: " + nowStock.getPrice() + "\n";
             i++;
         }
         return spisok;
+    }
+
+    public boolean updateHoldings(String name, int quantity) {
+        if (quantity != 0) {
+            Holding nowHolding = null;
+            for (Holding holding : list) {
+                if (holding.getName().equals(name)) {
+                    nowHolding = holding;
+                    }
+                }
+            if (nowHolding != null) {
+                if (nowHolding.getQuantity() + quantity > 0) {
+                    nowHolding.setQuantity(nowHolding.getQuantity() + quantity);
+                    return true;
+                } else if (nowHolding.getQuantity() + quantity == 0) {
+                    this.list.remove(nowHolding);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                if (quantity > 0) {
+                    this.list.add(new Holding(name, quantity));
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
     }
 
     public void loadFromFile() {
@@ -62,6 +93,14 @@ public class StocksPortfolio {
 
         } catch (IOException e) {
             System.out.println("Ошибка при сохранении данных");
+        }
+    }
+
+    public Holding getHolding(String number) {
+        try {
+            return this.list.get(Integer.parseInt(number) - 1);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            return null;
         }
     }
 

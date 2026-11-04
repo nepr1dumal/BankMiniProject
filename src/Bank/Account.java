@@ -73,6 +73,7 @@ public class Account {
                     case "EXPENSE" -> {if (line.length == 4) history.add(new Expense(new BigDecimal(line[1]), line[2], line[3])); }
                     case "TRANSFER" -> {if (line.length == 5) history.add(new Transfer(new BigDecimal(line[1]), line[4], line[3])); }
                     case "STOCK PURCHASE" -> {if (line.length == 5) history.add(new StockPurchase(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
+                    case "STOCK SALE" -> {if (line.length == 5) history.add(new StockSale(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
                 }
             }
             int a = this.history.size();

@@ -2,28 +2,16 @@ package Model;
 
 import java.math.BigDecimal;
 
-public class StockPurchase extends Transaction {
+public class StockPurchase extends StockOperation {
 
     private static final String TYPE = "STOCK PURCHASE";
-    private int quantity;
 
     public StockPurchase(BigDecimal value, String name, int quantity) {
-        super(value, name);
-        this.quantity = quantity;
+        super(value, name, quantity);
     }
 
     public StockPurchase(BigDecimal value, String name, String date, int quantity) {
-        super(value, name, date);
-        this.quantity = quantity;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    @Override
-    public String toString() {
-        return getType() + " | " + getValue().toPlainString() + " | " + getName() + " | " + getQuantity() + " | " + getDate();
+        super(value, name, date, quantity);
     }
 
     @Override

@@ -85,4 +85,14 @@ public class ConsoleInput {
         }
     }
 
+    public static String readStock(Scanner scan, String prompt) {
+        System.out.print(prompt);
+        String number = scan.nextLine().trim();
+        if (number.isEmpty()) {
+            return null;
+        } else {
+            return number;
+        }
+    }
+
 }

@@ -18,6 +18,7 @@ public class Main {
         main.loadFromFile();
         contacts.loadContacts();
         stocksPortfolio.loadFromFile();
+        stocks.loadFromFile();
         boolean flag = true;
         System.out.println("Добро пожаловать!");
         while(flag){
