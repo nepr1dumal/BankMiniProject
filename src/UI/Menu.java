@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class Menu {
-    private Scanner scan;
-    private Account account;
-    private Contacts contacts;
-    private Stocks stocks;
-    private StocksPortfolio stocksPortfolio;
+    private final Scanner scan;
+    private final Account account;
+    private final Contacts contacts;
+    private final Stocks stocks;
+    private final StocksPortfolio stocksPortfolio;
 
     public Menu(Scanner scan, Account account, Contacts contacts, Stocks stocks, StocksPortfolio stocksPortfolio) {
         this.scan = scan;
@@ -192,7 +192,7 @@ public class Menu {
             switch (choose) {
                 case "1": {
                     stocks.updateStocks();
-                    System.out.println(stocks.toString());
+                    System.out.println(stocks);
                     String numberOfStock = ConsoleInput.readStock(scan, "Выберите акцию для покупки (Enter - отмена): ");
                     if (numberOfStock == null) {
                         System.out.println("Возвращение...");
@@ -224,7 +224,7 @@ public class Menu {
                     if (stocksPortfolio.toString().isEmpty()) {
                         System.out.println("Пустой портфель");
                     } else {
-                        System.out.println(stocksPortfolio.toString());
+                        System.out.println(stocksPortfolio);
                         String numberOfStock = ConsoleInput.readStock(scan, "Выберите акцию для продажи (Enter - отмена): ");
                         if (numberOfStock == null) {
                             System.out.println("Возвращение...");
