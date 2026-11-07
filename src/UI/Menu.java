@@ -7,6 +7,8 @@ import Bank.StocksPortfolio;
 import Model.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Menu {
@@ -38,6 +40,11 @@ public class Menu {
                     String name = ConsoleInput.readName(scan, "Название операции: ");
                     account.newTransaction(new Income(summ, name));
                     System.out.println("Операция успешно завершена.");
+                    if (stocksPortfolio.updateDividendPayments()) {
+                        for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
+                            account.newTransaction(dividend);
+                        }
+                    }
                     break;
                 }
                 case "2": {
@@ -50,6 +57,11 @@ public class Menu {
                     String name = ConsoleInput.readName(scan, "Название операции: ");
                     if (account.tryTransaction(summ)) {
                         System.out.println("Операция успешно завершена.");
+                        if (stocksPortfolio.updateDividendPayments()) {
+                            for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
+                                account.newTransaction(dividend);
+                            }
+                        }
                         account.newTransaction(new Expense(summ, name));
                     } else {
                         System.out.println("Отклонено, недостаточно средств");
@@ -72,6 +84,11 @@ public class Menu {
                         summ = summ.negate();
                         if (account.tryTransaction(summ)) {
                             System.out.println("Успешный перевод");
+                            if (stocksPortfolio.updateDividendPayments()) {
+                                for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
+                                    account.newTransaction(dividend);
+                                }
+                            }
                             account.newTransaction(new Transfer(summ, contacts.getName(card)));
                         } else {
                             System.out.println("Недостаточно средств");
@@ -212,6 +229,11 @@ public class Menu {
                             if (stocksPortfolio.updateHoldings(nowStock.getName(), number)) {
                                 account.newTransaction(new StockPurchase(value, "Покупка: " + nowStock.getName(), number));
                                 System.out.println("Успешная покупка!");
+                                if (stocksPortfolio.updateDividendPayments()) {
+                                    for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
+                                        account.newTransaction(dividend);
+                                    }
+                                }
                             }
                         } else {
                             System.out.println("Недостаточно средств");
@@ -243,6 +265,11 @@ public class Menu {
                             if (stocksPortfolio.updateHoldings(nowHolding.getName(), -number)) {
                                 account.newTransaction(new StockSale(value.multiply(new BigDecimal(number)), "Продажа: " + nowHolding.getName(), number));
                                 System.out.println("Успешная транзакция");
+                                if (stocksPortfolio.updateDividendPayments()) {
+                                    for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
+                                        account.newTransaction(dividend);
+                                    }
+                                }
                             } else {
                                 System.out.println("Недостаточно акций");
                             }
@@ -258,4 +285,5 @@ public class Menu {
             }
         }
     }
+
 }

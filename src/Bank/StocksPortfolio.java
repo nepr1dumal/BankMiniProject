@@ -1,11 +1,14 @@
 package Bank;
 
+import Model.Dividend;
 import Model.Holding;
 import Model.Stock;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -13,6 +16,9 @@ public class StocksPortfolio {
 
     private ArrayList<Holding> list = new ArrayList<>();
     private Stocks stocks;
+    private int dividendPaymentTime;
+    private final static int DIVIDENDBORDER = 10;
+    private final static BigDecimal DIVIDEND_PERCENT = new BigDecimal("10.00").divide(new BigDecimal("100.00"));
 
     public StocksPortfolio(Stocks stocks) {
         this.stocks = stocks;
@@ -68,6 +74,12 @@ public class StocksPortfolio {
             return;
         }
         try (Scanner fileScanner = new Scanner(file)) {
+            try {
+                String[] dividendPayment = fileScanner.nextLine().split("/", 2);
+                this.dividendPaymentTime = Integer.parseInt(dividendPayment[0]);
+            } catch (NumberFormatException e) {
+                this.dividendPaymentTime = 0;
+            }
             while (fileScanner.hasNextLine()) {
                 try {
                     String[] holdingInfo = fileScanner.nextLine().split("\\|", 2);
@@ -86,6 +98,7 @@ public class StocksPortfolio {
 
     public void saveHoldings() {
         try (FileWriter writer = new FileWriter("holdings.txt")) {
+            writer.write(this.dividendPaymentTime + "/" + DIVIDENDBORDER + "\n");
             for(Holding holding : list) {
                 writer.write(holding.getName() + "|" + holding.getQuantity() + "\n");
             }
@@ -104,5 +117,27 @@ public class StocksPortfolio {
         }
     }
 
+    public boolean updateDividendPayments() {
+        this.dividendPaymentTime++;
+        if (this.dividendPaymentTime == DIVIDENDBORDER) {
+            dividendPaymentTime = 0;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public ArrayList<Holding> getList() {
+        ArrayList<Holding> list = new ArrayList<>(this.list);
+        return list;
+    }
+
+    public ArrayList<Dividend> dividendsPayment() {
+        ArrayList<Dividend> values = new ArrayList<>();
+        for (Holding holding : this.list) {
+            values.add(new Dividend(stocks.getStockByName(holding.getName()).getPrice().multiply(new BigDecimal(holding.getQuantity())).multiply(DIVIDEND_PERCENT).setScale(2, RoundingMode.HALF_UP), "Выплата дивидендов: " + holding.getName(), holding.getQuantity()));
+        }
+        return values;
+    }
 
 }
