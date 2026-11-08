@@ -66,16 +66,16 @@ public class ConsoleInput {
         }
     }
 
-    public static int readNumber(Scanner scan, String prompt) {
+    public static Integer readNumber(Scanner scan, String prompt) {
         while (true) {
             try {
                 System.out.print(prompt);
                 String number = scan.nextLine().trim();
                 if (number.isEmpty()) {
-                    return -404;
+                    return null;
                 }
                 if (Integer.parseInt(number) > 0) {
-                    return Integer.parseInt(number);
+                    return Integer.valueOf(number);
                 } else {
                     System.out.println("Число акций должно быть больше 0");
                 }

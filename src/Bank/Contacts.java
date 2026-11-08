@@ -70,7 +70,6 @@ public class Contacts {
     public void removeContact(String number) {
         this.contacts.remove(number);
     }
-
 }
 
 

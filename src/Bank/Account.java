@@ -69,15 +69,16 @@ public class Account {
             while (fileScanner.hasNextLine()) {
                 try {
                     String[] line = fileScanner.nextLine().split(" \\| ");
-                    switch (line[0]) {
-                        case "INCOME" -> {if (line.length == 4) history.add(new Income(new BigDecimal(line[1]), line[2], line[3])); }
-                        case "EXPENSE" -> {if (line.length == 4) history.add(new Expense(new BigDecimal(line[1]), line[2], line[3])); }
-                        case "TRANSFER" -> {if (line.length == 5) history.add(new Transfer(new BigDecimal(line[1]), line[4], line[3])); }
-                        case "STOCK PURCHASE" -> {if (line.length == 5) history.add(new StockPurchase(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
-                        case "STOCK SALE" -> {if (line.length == 5) history.add(new StockSale(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
-                        case "DIVIDEND" -> {if (line.length == 5) history.add(new Dividend(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
+                    TransactionType type = TransactionType.valueOf(line[0]);
+                    switch (type) {
+                        case INCOME -> {if (line.length == 4) history.add(new Income(new BigDecimal(line[1]), line[2], line[3])); }
+                        case EXPENSE -> {if (line.length == 4) history.add(new Expense(new BigDecimal(line[1]), line[2], line[3])); }
+                        case TRANSFER -> {if (line.length == 5) history.add(new Transfer(new BigDecimal(line[1]), line[4], line[3])); }
+                        case STOCK_PURCHASE -> {if (line.length == 5) history.add(new StockPurchase(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
+                        case STOCK_SALE -> {if (line.length == 5) history.add(new StockSale(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
+                        case DIVIDEND -> {if (line.length == 5) history.add(new Dividend(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
                     }
-                } catch (NumberFormatException e) {
+                } catch (IllegalArgumentException e) {
                     continue;
                 }
             }

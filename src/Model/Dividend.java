@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 
 public class Dividend extends StockOperation{
 
-    private static final String TYPE = "DIVIDEND";
-
     public Dividend(BigDecimal value, String name, int quantity) {
         super(value, name, quantity);
     }
@@ -15,7 +13,7 @@ public class Dividend extends StockOperation{
     }
 
     @Override
-    public String getType() {
-        return TYPE;
+    public TransactionType getType() {
+        return TransactionType.DIVIDEND;
     }
 }

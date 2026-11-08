@@ -219,8 +219,8 @@ public class Menu {
                     if (nowStock == null) {
                         System.out.println("Неверная команда");
                     } else {
-                        int number = ConsoleInput.readNumber(scan, "Покупка: " + nowStock.getName() + ". Введите количество акций(Enter - отмена): ");
-                        if (number == -404) {
+                        Integer number = ConsoleInput.readNumber(scan, "Покупка: " + nowStock.getName() + ". Введите количество акций(Enter - отмена): ");
+                        if (number == null) {
                             System.out.println("Возвращение...");
                             break;
                         }
@@ -257,8 +257,8 @@ public class Menu {
                             System.out.println("Неверная команда");
                         } else {
                             BigDecimal value = new BigDecimal(String.valueOf(stocks.getStockByName(nowHolding.getName()).getPrice()));
-                            int number = ConsoleInput.readNumber(scan, nowHolding.getName() + ". Введите количество акций (Enter - отмена): ");
-                            if (number == -404) {
+                            Integer number = ConsoleInput.readNumber(scan, nowHolding.getName() + ". Введите количество акций (Enter - отмена): ");
+                            if (number == null) {
                                 System.out.println("Возвращение...");
                                 break;
                             }

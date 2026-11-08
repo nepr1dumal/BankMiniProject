@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 public class Transfer extends Transaction {
 
-    private static final String TYPE = "TRANSFER";
     private String nameOfUser;
 
     public Transfer(BigDecimal value, String date, String nameOfUser) {
@@ -18,8 +17,8 @@ public class Transfer extends Transaction {
     }
 
     @Override
-    public String getType() {
-        return TYPE;
+    public TransactionType getType() {
+        return TransactionType.TRANSFER;
     }
 
     public String getNameOfUser() {

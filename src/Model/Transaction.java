@@ -36,7 +36,7 @@ public abstract class Transaction {
         return this.date;
     }
 
-    public abstract String getType();
+    public abstract TransactionType getType();
 
     @Override
     public String toString() {

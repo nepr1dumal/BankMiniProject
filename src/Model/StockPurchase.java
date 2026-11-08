@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 
 public class StockPurchase extends StockOperation {
 
-    private static final String TYPE = "STOCK PURCHASE";
-
     public StockPurchase(BigDecimal value, String name, int quantity) {
         super(value, name, quantity);
     }
@@ -15,8 +13,8 @@ public class StockPurchase extends StockOperation {
     }
 
     @Override
-    public String getType() {
-        return TYPE;
+    public TransactionType getType() {
+        return TransactionType.STOCK_PURCHASE;
     }
 
 }

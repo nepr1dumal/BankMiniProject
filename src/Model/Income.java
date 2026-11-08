@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 
 public class Income extends Transaction {
 
-    private static final String TYPE = "INCOME";
-
     public Income(BigDecimal value, String name, String date) {
         super(value, name, date);
     }
@@ -15,8 +13,8 @@ public class Income extends Transaction {
     }
 
     @Override
-    public String getType() {
-        return TYPE;
+    public TransactionType getType() {
+        return TransactionType.INCOME;
     }
 
 }
