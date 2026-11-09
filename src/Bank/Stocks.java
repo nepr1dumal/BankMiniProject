@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Stocks {
+public class Stocks implements Saveable{
 
     private ArrayList<Stock> list = new ArrayList<>();
     private Random random = new Random();
@@ -54,6 +54,7 @@ public class Stocks {
         return null;
     }
 
+    @Override
     public void loadFromFile() {
         File file = new File("stocks.txt");
         if(!file.exists()) {
@@ -83,7 +84,8 @@ public class Stocks {
         }
     }
 
-    public void saveStocks() {
+    @Override
+    public void saveToFile() {
         try (FileWriter writer = new FileWriter("stocks.txt")) {
             for (Stock stock : list) {
                 writer.write(stock.getName() + "|" + stock.getPrice() + "\n");

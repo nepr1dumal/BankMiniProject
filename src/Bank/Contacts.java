@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Contacts {
+public class Contacts implements Saveable{
 
     private HashMap<String, String> contacts = new HashMap<>();
 
@@ -23,7 +23,8 @@ public class Contacts {
         return a;
     }
 
-    public void saveContacts() {
+    @Override
+    public void saveToFile() {
         try (FileWriter writer = new FileWriter("contacts.txt")) {
             for(Map.Entry<String, String> contact : contacts.entrySet()) {
                 writer.write(contact.getKey() + "|" + contact.getValue() + "\n");
@@ -35,7 +36,8 @@ public class Contacts {
         }
     }
 
-    public void loadContacts() {
+    @Override
+    public void loadFromFile() {
         File file = new File("contacts.txt");
         if(!file.exists()) {
             System.out.println("Список контактов не найден. Начинаем с пустого.");

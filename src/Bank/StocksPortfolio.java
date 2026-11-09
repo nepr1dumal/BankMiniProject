@@ -12,12 +12,12 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class StocksPortfolio {
+public class StocksPortfolio implements Saveable{
 
     private ArrayList<Holding> list = new ArrayList<>();
     private Stocks stocks;
     private int dividendPaymentTime;
-    private final static int DIVIDENDBORDER = 10;
+    private final static int DIVIDEND_BORDER = 10;
     private final static BigDecimal DIVIDEND_PERCENT = new BigDecimal("10.00").divide(new BigDecimal("100.00"));
 
     public StocksPortfolio(Stocks stocks) {
@@ -30,7 +30,7 @@ public class StocksPortfolio {
         String spisok = "";
         for (Holding line : list) {
             Stock nowStock = stocks.getStockByName(line.getName());
-            spisok += i + ": " + line.getName() + ". Количество - " + line.getQuantity() + ". Цена: " + nowStock.getPrice() + "\n";
+            spisok += i + ": " + line.getName() + ". Количество - " + line.getQuantity() + ". Средняя цена покупки: " + line.getAverageValue() + ". Цена: " + nowStock.getPrice() + ". Разница: " + nowStock.getPrice().subtract(line.getAverageValue()) + "\n";
             i++;
         }
         return spisok;
@@ -46,7 +46,7 @@ public class StocksPortfolio {
                 }
             if (nowHolding != null) {
                 if (nowHolding.getQuantity() + quantity > 0) {
-                    nowHolding.setQuantity(nowHolding.getQuantity() + quantity);
+                    nowHolding.changeQuantity(nowHolding.getQuantity() + quantity, stocks.getStockByName(nowHolding.getName()).getPrice());
                     return true;
                 } else if (nowHolding.getQuantity() + quantity == 0) {
                     this.list.remove(nowHolding);
@@ -56,7 +56,7 @@ public class StocksPortfolio {
                 }
             } else {
                 if (quantity > 0) {
-                    this.list.add(new Holding(name, quantity));
+                    this.list.add(new Holding(name, quantity, stocks.getStockByName(name).getPrice()));
                     return true;
                 } else {
                     return false;
@@ -67,6 +67,7 @@ public class StocksPortfolio {
         }
     }
 
+    @Override
     public void loadFromFile() {
         File file = new File("holdings.txt");
         if(!file.exists()) {
@@ -82,9 +83,9 @@ public class StocksPortfolio {
             }
             while (fileScanner.hasNextLine()) {
                 try {
-                    String[] holdingInfo = fileScanner.nextLine().split("\\|", 2);
-                    if (holdingInfo.length == 2) {
-                        this.list.add(new Holding(holdingInfo[0], Integer.parseInt(holdingInfo[1])));
+                    String[] holdingInfo = fileScanner.nextLine().split(" \\| ", 3);
+                    if (holdingInfo.length == 3) {
+                        this.list.add(new Holding(holdingInfo[0], Integer.parseInt(holdingInfo[1]), new BigDecimal(holdingInfo[2])));
                     }
                 } catch (NumberFormatException e) {
                     continue;
@@ -96,11 +97,12 @@ public class StocksPortfolio {
         }
     }
 
-    public void saveHoldings() {
+    @Override
+    public void saveToFile() {
         try (FileWriter writer = new FileWriter("holdings.txt")) {
-            writer.write(this.dividendPaymentTime + "/" + DIVIDENDBORDER + "\n");
+            writer.write(this.dividendPaymentTime + "/" + DIVIDEND_BORDER + "\n");
             for(Holding holding : list) {
-                writer.write(holding.getName() + "|" + holding.getQuantity() + "\n");
+                writer.write(holding.getName() + " | " + holding.getQuantity() + " | " + holding.getAverageValue() + "\n");
             }
             System.out.println("Данные успешно сохранены в holdings.txt");
 
@@ -119,17 +121,12 @@ public class StocksPortfolio {
 
     public boolean updateDividendPayments() {
         this.dividendPaymentTime++;
-        if (this.dividendPaymentTime == DIVIDENDBORDER) {
+        if (this.dividendPaymentTime == DIVIDEND_BORDER) {
             dividendPaymentTime = 0;
             return true;
         } else {
             return false;
         }
-    }
-
-    public ArrayList<Holding> getList() {
-        ArrayList<Holding> list = new ArrayList<>(this.list);
-        return list;
     }
 
     public ArrayList<Dividend> dividendsPayment() {

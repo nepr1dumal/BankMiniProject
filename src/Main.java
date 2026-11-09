@@ -1,9 +1,7 @@
-import Bank.Account;
-import Bank.Contacts;
-import Bank.Stocks;
-import Bank.StocksPortfolio;
+import Bank.*;
 import UI.Menu;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -13,12 +11,16 @@ public class Main {
         Contacts contacts = new Contacts();
         Stocks stocks = new Stocks();
         StocksPortfolio stocksPortfolio = new StocksPortfolio(stocks);
+        ArrayList<Saveable> saveables = new ArrayList<>();
+        saveables.add(main);
+        saveables.add(contacts);
+        saveables.add(stocks);
+        saveables.add(stocksPortfolio);
         Scanner scan = new Scanner(System.in);
         Menu menu = new Menu(scan, main, contacts, stocks, stocksPortfolio);
-        main.loadFromFile();
-        contacts.loadContacts();
-        stocksPortfolio.loadFromFile();
-        stocks.loadFromFile();
+        for (Saveable saveable : saveables) {
+            saveable.loadFromFile();
+        }
         boolean flag = true;
         System.out.println("Добро пожаловать!");
         while(flag){
@@ -44,6 +46,9 @@ public class Main {
                     menu.clearHistory();
                     break;
                 case "6":
+                    for (Saveable saveable : saveables) {
+                        saveable.saveToFile();
+                    }
                     menu.exit();
                     flag = false;
                     break;

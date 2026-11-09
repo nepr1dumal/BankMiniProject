@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.File;
 import java.util.Scanner;
 
-public class Account {
+public class Account implements Saveable{
 
     private BigDecimal wallet = BigDecimal.ZERO.setScale(2,RoundingMode.HALF_UP);
     private ArrayList<Transaction> history = new ArrayList<>();
@@ -42,6 +42,7 @@ public class Account {
         this.history.clear();
     }
 
+    @Override
     public void saveToFile() {
         try (FileWriter writer = new FileWriter("database.txt")) {
             writer.write(this.wallet.toPlainString() + "\n");
@@ -55,6 +56,7 @@ public class Account {
         }
     }
 
+    @Override
     public void loadFromFile() {
         File file = new File("database.txt");
         if (!file.exists()) {

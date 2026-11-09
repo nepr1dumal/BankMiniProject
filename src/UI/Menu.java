@@ -1,9 +1,6 @@
 package UI;
 
-import Bank.Account;
-import Bank.Contacts;
-import Bank.Stocks;
-import Bank.StocksPortfolio;
+import Bank.*;
 import Model.*;
 
 import java.math.BigDecimal;
@@ -194,10 +191,6 @@ public class Menu {
     }
 
     public void exit() {
-        account.saveToFile();
-        contacts.saveContacts();
-        stocksPortfolio.saveHoldings();
-        stocks.saveStocks();
         System.out.println("Всего доброго!");
     }
 
