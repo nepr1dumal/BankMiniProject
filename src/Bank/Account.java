@@ -1,6 +1,11 @@
 package Bank;
 
-import Model.*;
+import Model.Credit.CreditPayment;
+import Model.Credit.CreditReceived;
+import Model.Stock.Dividend;
+import Model.Stock.StockPurchase;
+import Model.Stock.StockSale;
+import Model.Transaction.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -79,6 +84,8 @@ public class Account implements Saveable{
                         case STOCK_PURCHASE -> {if (line.length == 5) history.add(new StockPurchase(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
                         case STOCK_SALE -> {if (line.length == 5) history.add(new StockSale(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
                         case DIVIDEND -> {if (line.length == 5) history.add(new Dividend(new BigDecimal(line[1]), line[2], line[4], Integer.parseInt(line[3]))); }
+                        case CREDIT_PAYMENT -> {if (line.length == 4) history.add(new CreditPayment(new BigDecimal(line[1]), line[2], line[3])); }
+                        case CREDIT_RECEIVED -> {if (line.length == 4) history.add(new CreditReceived(new BigDecimal(line[1]), line[2], line[3])); }
                     }
                 } catch (IllegalArgumentException e) {
                     continue;

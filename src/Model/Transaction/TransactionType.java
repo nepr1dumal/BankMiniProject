@@ -1,0 +1,5 @@
+package Model.Transaction;
+
+public enum TransactionType {
+    INCOME, EXPENSE, TRANSFER, STOCK_PURCHASE, STOCK_SALE, DIVIDEND, CREDIT_RECEIVED, CREDIT_PAYMENT;
+}

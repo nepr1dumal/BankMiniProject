@@ -1,4 +1,6 @@
-package Model;
+package Model.Stock;
+
+import Model.Transaction.TransactionType;
 
 import java.math.BigDecimal;
 

@@ -1,24 +1,28 @@
 package Bank;
 
+import Model.Contact.Contact;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Contacts implements Saveable{
 
-    private HashMap<String, String> contacts = new HashMap<>();
+    private ArrayList<Contact> contacts = new ArrayList<>();
 
-    public void saveContact(String number, String name) {
-        this.contacts.put(number, name);
+    public void saveContact(String name, String number) {
+        this.contacts.add(new Contact(name, number));
     }
 
-    public String getContacts() {
+    @Override
+    public String toString() {
         String a = "";
-        for (Map.Entry<String, String> contact : contacts.entrySet()) {
-            a += contact.getValue() + "|" + contact.getKey() + "\n";
+        int i = 1;
+        for (Contact contact : contacts) {
+            a += i + ": " + contact.getName() + " | " + contact.getNumber() + "\n";
+            i++;
         }
         return a;
     }
@@ -26,8 +30,8 @@ public class Contacts implements Saveable{
     @Override
     public void saveToFile() {
         try (FileWriter writer = new FileWriter("contacts.txt")) {
-            for(Map.Entry<String, String> contact : contacts.entrySet()) {
-                writer.write(contact.getKey() + "|" + contact.getValue() + "\n");
+            for(Contact contact : contacts) {
+                writer.write(contact.getName() + " | " + contact.getNumber() + "\n");
             }
             System.out.println("Данные успешно сохранены в contacts.txt");
 
@@ -45,9 +49,9 @@ public class Contacts implements Saveable{
         }
         try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNextLine()) {
-                String[] cards = fileScanner.nextLine().split("\\|", 2);
-                if (cards.length == 2 && cards[0].matches("\\d{16}")) {
-                    contacts.put(cards[0], cards[1]);
+                String[] cards = fileScanner.nextLine().split(" \\| ", 2);
+                if (cards.length == 2 && cards[1].matches("\\d{16}")) {
+                    contacts.add(new Contact(cards[0], cards[1]));
                 }
             }
             System.out.println("Контакты загружены!");
@@ -57,20 +61,43 @@ public class Contacts implements Saveable{
     }
 
     public boolean haveContact(String number) {
-        String a = this.contacts.get(number);
-        if (a == null) {
-            return false;
-        } else {
-            return true;
+        for (Contact contact : contacts) {
+            if (contact.getNumber().equals(number)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Contact getContactByNumber(String number) {
+        for (Contact contact : contacts) {
+            if (contact.getNumber().equals(number)) {
+                return contact;
+            }
+        }
+        return null;
+    }
+
+    public boolean removeContact(String number) {
+        for (Contact contact : contacts) {
+            if (contact.getNumber().equals(number)) {
+                this.contacts.remove(contact);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Contact getContactByList(String numberInList) {
+        try {
+            return contacts.get(Integer.parseInt(numberInList) - 1);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            return null;
         }
     }
 
-    public String getName(String number) {
-        return this.contacts.get(number);
-    }
-
-    public void removeContact(String number) {
-        this.contacts.remove(number);
+    public void renameContact(String name, Contact contact) {
+        contact.setName(name);
     }
 }
 

@@ -1,6 +1,6 @@
 package Bank;
 
-import Model.Stock;
+import Model.Stock.Stock;
 
 import java.io.File;
 import java.io.FileNotFoundException;

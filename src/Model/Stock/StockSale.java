@@ -1,8 +1,10 @@
-package Model;
+package Model.Stock;
+
+import Model.Transaction.TransactionType;
 
 import java.math.BigDecimal;
 
-public class StockSale extends StockOperation{
+public class StockSale extends StockOperation {
 
     public StockSale(BigDecimal value, String name, int quantity) {
         super(value, name, quantity);

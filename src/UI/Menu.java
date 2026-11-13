@@ -1,11 +1,20 @@
 package UI;
 
 import Bank.*;
-import Model.*;
+import Model.Contact.Contact;
+import Model.Credit.CreditPayment;
+import Model.Credit.CreditReceived;
+import Model.Credit.CreditType;
+import Model.Stock.Dividend;
+import Model.Stock.Holding;
+import Model.Stock.Stock;
+import Model.Stock.StockPurchase;
+import Model.Stock.StockSale;
+import Model.Transaction.Expense;
+import Model.Transaction.Income;
+import Model.Transaction.Transfer;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Menu {
@@ -14,13 +23,15 @@ public class Menu {
     private final Contacts contacts;
     private final Stocks stocks;
     private final StocksPortfolio stocksPortfolio;
+    private final CreditInfo creditInfo;
 
-    public Menu(Scanner scan, Account account, Contacts contacts, Stocks stocks, StocksPortfolio stocksPortfolio) {
+    public Menu(Scanner scan, Account account, Contacts contacts, Stocks stocks, StocksPortfolio stocksPortfolio, CreditInfo creditInfo) {
         this.scan = scan;
         this.account = account;
         this.contacts = contacts;
         this.stocks = stocks;
         this.stocksPortfolio = stocksPortfolio;
+        this.creditInfo = creditInfo;
     }
 
     public void operations() {
@@ -37,11 +48,7 @@ public class Menu {
                     String name = ConsoleInput.readName(scan, "Название операции: ");
                     account.newTransaction(new Income(summ, name));
                     System.out.println("Операция успешно завершена.");
-                    if (stocksPortfolio.updateDividendPayments()) {
-                        for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
-                            account.newTransaction(dividend);
-                        }
-                    }
+                    updateCounters();
                     break;
                 }
                 case "2": {
@@ -54,25 +61,29 @@ public class Menu {
                     String name = ConsoleInput.readName(scan, "Название операции: ");
                     if (account.tryTransaction(summ)) {
                         System.out.println("Операция успешно завершена.");
-                        if (stocksPortfolio.updateDividendPayments()) {
-                            for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
-                                account.newTransaction(dividend);
-                            }
-                        }
                         account.newTransaction(new Expense(summ, name));
+                        updateCounters();
                     } else {
                         System.out.println("Отклонено, недостаточно средств");
                     }
                     break;
                 }
                 case "3": {
-                    String card = ConsoleInput.readCard(scan);
-                    if (card == null) {
+                    String list = contacts.toString();
+                    if (!list.isEmpty()) {
+                        System.out.println(list);
+                    } else {
+                        System.out.println("Пустой список контактов");
+                        break;
+                    }
+                    String input = ConsoleInput.readStock(scan, "Введите номер контакта из списка (Enter - отмена): ");
+                    if (input == null) {
                         System.out.println("Возвращение...");
                         break;
                     }
-                    if (contacts.getName(card) != null) {
-                        System.out.println("Получатель: " + contacts.getName(card));
+                    Contact nowContact = contacts.getContactByList(input);
+                    if (nowContact != null) {
+                        System.out.println("Получатель: " + nowContact.getName());
                         BigDecimal summ = ConsoleInput.readAmount(scan);
                         if (summ == null) {
                             System.out.println("Возвращение...");
@@ -81,17 +92,13 @@ public class Menu {
                         summ = summ.negate();
                         if (account.tryTransaction(summ)) {
                             System.out.println("Успешный перевод");
-                            if (stocksPortfolio.updateDividendPayments()) {
-                                for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
-                                    account.newTransaction(dividend);
-                                }
-                            }
-                            account.newTransaction(new Transfer(summ, contacts.getName(card)));
+                            account.newTransaction(new Transfer(summ, nowContact.getName()));
+                            updateCounters();
                         } else {
                             System.out.println("Недостаточно средств");
                         }
                     } else {
-                        System.out.println("Отсутствующий контакт");
+                        System.out.println("Неверный номер контакта");
                     }
                     break;
                 }
@@ -109,33 +116,32 @@ public class Menu {
     public void contactOperation() {
         boolean status = true;
         while (status) {
-            System.out.println("1. Список контактов\n2. Добавить контакт\n3. Удалить контакт\n4. Назад");
+            String list = contacts.toString();
+            if (!list.isEmpty()) {
+                System.out.println(list);
+            } else {
+                System.out.println("Пустой список контактов");
+            }
+            System.out.println("1. Добавить контакт\n2. Удалить контакт\n3. Изменить контакт\n4. Назад");
             String selection = scan.nextLine();
             switch (selection) {
-                case "1":
-                    String list = contacts.getContacts();
-                    if (!list.isEmpty()) {
-                        System.out.println(list);
-                    } else {
-                        System.out.println("Пустой список");
-                    }
-                    break;
-                case "2": {
+                case "1": {
                     String card = ConsoleInput.readCard(scan);
                     if (card == null) {
                         System.out.println("Возвращение...");
                         break;
                     }
-                    if (contacts.getName(card) == null) {
+                    if (contacts.getContactByNumber(card) == null) {
                         String name = ConsoleInput.readName(scan, "Имя: ");
-                        contacts.saveContact(card, name);
+                        contacts.saveContact(name, card);
                         System.out.println("Контакт сохранён");
                     } else {
-                        System.out.println("Такая карта уже существует, перезаписать контакт?");
+                        System.out.println("Контакт с такой картой уже существует, перезаписать контакт?");
+                        Contact nowContact = contacts.getContactByNumber(card);
                         boolean choose = ConsoleInput.readYesNo(scan);
                         if (choose) {
                             String name = ConsoleInput.readName(scan, "Имя: ");
-                            contacts.saveContact(card, name);
+                            nowContact.setName(name);
                             System.out.println("Контакт перезаписан");
                         } else {
                             System.out.println("Возвращение...");
@@ -143,24 +149,40 @@ public class Menu {
                     }
                     break;
                 }
-                case "3": {
-                    String card = ConsoleInput.readCard(scan);
-                    if (card == null) {
+                case "2": {
+                    String input = ConsoleInput.readStock(scan, "Введите номер контакта из списка (Enter - отмена): ");
+                    if (input == null) {
                         System.out.println("Возвращение...");
                         break;
                     }
-                    if (contacts.getName(card) != null) {
-                        System.out.println("Удаление: " + contacts.getName(card));
-                        boolean choose = ConsoleInput.readYesNo(scan);
-                        if (choose) {
-                            contacts.removeContact(card);
-                            System.out.println("Успешное удаление");
-                        } else {
-                            System.out.println("Возвращение...");
-                        }
-                    } else {
-                        System.out.println("Контакта с таким номером карты не существует");
+                    Contact nowContact = contacts.getContactByList(input);
+                    if (nowContact == null) {
+                        System.out.println("Неверный номер контакта");
+                        break;
                     }
+                    System.out.println("Удаление: " + nowContact.getName());
+                    if (ConsoleInput.readYesNo(scan)) {
+                        contacts.removeContact(nowContact.getNumber());
+                        System.out.println("Контакт удалён");
+                    } else {
+                        System.out.println("Возвращение...");
+                    }
+                    break;
+                }
+                case "3": {
+                    String input = ConsoleInput.readStock(scan, "Введите номер контакта из списка (Enter - отмена): ");
+                    if (input == null) {
+                        System.out.println("Возвращение...");
+                        break;
+                    }
+                    Contact nowContact = contacts.getContactByList(input);
+                    if (nowContact == null) {
+                        System.out.println("Неверный номер контакта");
+                        break;
+                    }
+                    String name = ConsoleInput.readName(scan, "Введите новое имя: ");
+                    nowContact.setName(name);
+                    System.out.println("Успешное сохранение");
                     break;
                 }
                 case "4":
@@ -222,11 +244,7 @@ public class Menu {
                             if (stocksPortfolio.updateHoldings(nowStock.getName(), number)) {
                                 account.newTransaction(new StockPurchase(value, "Покупка: " + nowStock.getName(), number));
                                 System.out.println("Успешная покупка!");
-                                if (stocksPortfolio.updateDividendPayments()) {
-                                    for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
-                                        account.newTransaction(dividend);
-                                    }
-                                }
+                                updateCounters();
                             }
                         } else {
                             System.out.println("Недостаточно средств");
@@ -258,11 +276,7 @@ public class Menu {
                             if (stocksPortfolio.updateHoldings(nowHolding.getName(), -number)) {
                                 account.newTransaction(new StockSale(value.multiply(new BigDecimal(number)), "Продажа: " + nowHolding.getName(), number));
                                 System.out.println("Успешная транзакция");
-                                if (stocksPortfolio.updateDividendPayments()) {
-                                    for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
-                                        account.newTransaction(dividend);
-                                    }
-                                }
+                                updateCounters();
                             } else {
                                 System.out.println("Недостаточно акций");
                             }
@@ -279,4 +293,101 @@ public class Menu {
         }
     }
 
+    private void applyForCredit(CreditType type) {
+        System.out.println("Выбран: " + type.getInfo());
+        BigDecimal valueOfCredit = ConsoleInput.readAmount(scan);
+        if (valueOfCredit == null) {
+            System.out.println("Возвращение...");
+            return;
+        }
+        System.out.println(type.getNameOfCredit() + ". Сумма: " + valueOfCredit);
+        if (!ConsoleInput.readYesNo(scan)) {
+            System.out.println("Возвращение...");
+            return;
+        }
+        creditInfo.newCredit(type, valueOfCredit);
+        account.newTransaction(new CreditReceived(valueOfCredit));
+        System.out.println("Вы успешно взяли кредит!");
+    }
+
+    public void creditOperation() {
+        if (!creditInfo.hasCredit()) {
+            boolean status = true;
+            while (status) {
+                System.out.println("Выберите подходящий под вас формат кредита:\n1. " + CreditType.FAMILY.getInfo() + "\n2. " + CreditType.FAST.getInfo() + "\n3. " + CreditType.BUSINESS.getInfo() + "\n4. Назад");
+                switch (scan.nextLine()) {
+                    case "1": {
+                        applyForCredit(CreditType.FAMILY);
+                        break;
+                    }
+                    case "2": {
+                        applyForCredit(CreditType.FAST);
+                        break;
+                    }
+                    case "3": {
+                        applyForCredit(CreditType.BUSINESS);
+                        break;
+                    }
+                    case "4": {
+                        System.out.println("Возвращение...");
+                        status = false;
+                        break;
+                    }
+                    default:
+                        System.out.println("Неверная команда");
+                }
+                if (creditInfo.hasCredit()) {
+                    status = false;
+                }
+            }
+        } else {
+            boolean status = true;
+            while(status) {
+                System.out.println("1. Информация о кредите\n2. Платеж по кредиту\n3. Назад");
+                switch (scan.nextLine()) {
+                    case "1" -> {
+                        System.out.println(creditInfo.getCreditInfo());
+                    }
+                    case "2" -> {
+                        BigDecimal value = ConsoleInput.readAmount(scan);
+                        if (value == null) {
+                            System.out.println("Возвращение...");
+                            break;
+                        }
+                        if (account.tryTransaction(value.negate())) {
+                            account.newTransaction(new CreditPayment(value.negate()));
+                            System.out.println("Успешный платеж!");
+                            BigDecimal change = creditInfo.newPaid(value);
+                            if (!creditInfo.hasCredit() && change.compareTo(BigDecimal.ZERO) > 0) {
+                                account.newTransaction(new Income(change, "Возвращение переплаты оплаты кредита"));
+                            }
+                            if (!creditInfo.hasCredit()) {
+                                status = false;
+                            }
+                        } else {
+                            System.out.println("Недостаточно средств");
+                        }
+                    }
+                    case "3" -> {
+                        System.out.println("Возвращение...");
+                        status = false;
+                    }
+                    default -> {
+                        System.out.println("Неверная команда");
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateCounters() {
+        if (creditInfo.updateCounter()) {
+            System.out.println("Долг по кредиту увеличен, новое тело кредита: " + creditInfo.getValue());
+        }
+        if (stocksPortfolio.updateDividendPayments()) {
+            for (Dividend dividend : stocksPortfolio.dividendsPayment()) {
+                account.newTransaction(dividend);
+            }
+        }
+    }
 }

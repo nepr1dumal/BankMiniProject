@@ -1,8 +1,8 @@
 package Bank;
 
-import Model.Dividend;
-import Model.Holding;
-import Model.Stock;
+import Model.Stock.Dividend;
+import Model.Stock.Holding;
+import Model.Stock.Stock;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -1,8 +1,10 @@
-package Model;
+package Model.Stock;
+
+import Model.Transaction.Transaction;
 
 import java.math.BigDecimal;
 
-public abstract class StockOperation extends Transaction{
+public abstract class StockOperation extends Transaction {
 
     private int quantity;
 
